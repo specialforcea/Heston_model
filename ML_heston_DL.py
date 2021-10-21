@@ -64,13 +64,20 @@ dim = normX.shape[1]
 def inference(xs):
     
     # hidden layers, note that the weights and biases are encpasulated in the tf functions
-    a1 = tf.layers.dense(xs, 5, activation = tf.nn.elu, kernel_initializer = tf.variance_scaling_initializer)
-    a2 = tf.layers.dense(a1, 5, activation = tf.nn.elu, kernel_initializer = tf.variance_scaling_initializer)
-    a3 = tf.layers.dense(a2, 3, activation = tf.nn.elu, kernel_initializer = tf.variance_scaling_initializer)
-    a4 = tf.layers.dense(a3, 2, activation = tf.nn.elu, kernel_initializer = tf.variance_scaling_initializer)
-    #a5 = tf.layers.dense(a4, 2, activation = tf.nn.elu, kernel_initializer = tf.variance_scaling_initializer)
+    nodes = 15
+    a1 = tf.layers.dense(xs, nodes, activation = tf.nn.elu, kernel_initializer = tf.variance_scaling_initializer)
+    a2 = tf.layers.dense(a1, nodes, activation = tf.nn.elu, kernel_initializer = tf.variance_scaling_initializer)
+    a3 = tf.layers.dense(a2, nodes, activation = tf.nn.elu, kernel_initializer = tf.variance_scaling_initializer)
+    a4 = tf.layers.dense(a3, nodes, activation = tf.nn.elu, kernel_initializer = tf.variance_scaling_initializer)
+    a5 = tf.layers.dense(a4, nodes, activation = tf.nn.elu, kernel_initializer = tf.variance_scaling_initializer)
+    a6 = tf.layers.dense(a5, nodes, activation = tf.nn.elu, kernel_initializer = tf.variance_scaling_initializer)
+    a7 = tf.layers.dense(a6, nodes, activation = tf.nn.elu, kernel_initializer = tf.variance_scaling_initializer)
+    a8 = tf.layers.dense(a7, nodes, activation = tf.nn.elu, kernel_initializer = tf.variance_scaling_initializer)
+    a9 = tf.layers.dense(a8, nodes, activation = tf.nn.elu, kernel_initializer = tf.variance_scaling_initializer)
+    
+    
     # output payer
-    ys = tf.layers.dense(a4, 1, activation = None, kernel_initializer = tf.variance_scaling_initializer)
+    ys = tf.layers.dense(a9, 1, activation = None, kernel_initializer = tf.variance_scaling_initializer)
     
     return ys
 
@@ -120,7 +127,7 @@ def predict(xs, sess):
 feed_dict = {inputs:normX, labels:normY[:,np.newaxis]}
 
 # run the optimizer a few times (called epochs)
-epochs = 200000
+epochs = 1000
 
 # initialize
 sess = tf.Session()
@@ -151,7 +158,7 @@ while epo<epochs and MSE_test>0.01:
 
 
     print('MSE_train:{},MAE_train:{},MSE_test:{},MAE_test:{}'.format(MSE_train,MAE_train,MSE_test,MAE_test))
-#print(epo)
+print(epo)
 # test_df = test_set
 # test_df['predict_Y'] = predict(test_X,sess)
 # test_df_1 = test_df[abs(test_df['predict_Y']-test_df['heston_price'])<5]
@@ -164,23 +171,30 @@ while epo<epochs and MSE_test>0.01:
 # plt.scatter(test_df_1['heston_price'],test_df_1['predict_Y'],c='r')
 # plt.scatter(test_df_2['heston_price'],test_df_2['predict_Y'],c='b')
 
-plt.subplot(1,3,1)
-plt.scatter(pltepoche,np.log(losses[1:]))
+# plt.subplot(1,3,1)
+# plt.scatter(pltepoche,np.log(losses[1:]))
 
-plt.subplot(1,3,2)
-plt.scatter(test_Y,predict(test_X,sess))
-plt.plot(test_Y,test_Y,c='r')
+# plt.subplot(1,3,2)
+# plt.scatter(test_Y,predict(test_X,sess))
+# plt.plot(test_Y,test_Y,c='r')
 
-plt.subplot(1,3,3)
-plt.scatter(training_Y,predict(training_X,sess))
-plt.plot(training_Y,training_Y,c='r')
+# plt.subplot(1,3,3)
+# plt.scatter(training_Y,predict(training_X,sess))
+# plt.plot(training_Y,training_Y,c='r      ')
 
-plt.show()
+# plt.show()
 #
-#t = time.time()
-#predict(test_X, sess)
-#print('takes {}'.format(time.time() - t))
-#saver = tf.train.Saver()
-#saver.save(sess,'/Users/yueyuchen/Documents/Academy/Research/Notes/Algo trading & pricing/heston/DL32222.ckpt')
-#saver.restore(sess, "/Users/yueyuchen/Documents/Academy/Research/Notes/Algo trading & pricing/heston/DL32222.ckpt")
-#sess.close()
+
+# saver = tf.train.Saver()
+# #saver.save(sess,'/Users/yueyuchen/Documents/Academy/Research/Notes/Algo trading & pricing/heston/DL32222.ckpt')
+# saver.restore(sess, "/Users/yueyuchen/Documents/Academy/Research/Notes/Algo trading & pricing/heston_model/session DL15*9/DL15_9.ckpt")
+t = time.time()
+predict(test_X, sess)
+print('takes {}'.format(time.time() - t))
+sess.close()
+
+
+sess = tf.Session()
+
+new_saver = tf.train.import_meta_graph('/Users/yueyuchen/Documents/Academy/Research/Notes/Algo trading & pricing/heston_model/session DL13_8/DL13_8.ckpt.meta')
+new_saver.restore(sess, tf.train.latest_checkpoint('./'))

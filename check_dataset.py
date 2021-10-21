@@ -4,7 +4,7 @@ import pandas as pd
 import numpy as np
 from matplotlib import pyplot as plt
 
-data_set = pd.read_csv('test set.csv').iloc[:,1:] 
+data_set = pd.read_csv('training set.csv').iloc[:,1:] 
 
 N_sample = data_set.shape[0]
 
@@ -24,14 +24,14 @@ condition = np.zeros(N_sample)
 for i in range(N_sample):
 
 	maturity_date = ql.Date(serial_today + int(data_set.loc[i,'mat_data_range']))
-	strike_price = round(spot_price*data_set.loc[i,'strike'],4)
-	dividend_rate =  round(data_set.loc[i,'divident'],4)
-	risk_free_rate = round(data_set.loc[i,'interest'],4)
-	v0 = round(data_set.loc[i,'v_0'],4)
-	kappa = round(data_set.loc[i,'kappa_'],4)
-	theta = round(data_set.loc[i,'theta_'],4)
-	ita = round(data_set.loc[i,'ita_'],4)
-	rho = round(data_set.loc[i,'rho_'],4)
+	strike_price = spot_price*data_set.loc[i,'strike']
+	dividend_rate =  data_set.loc[i,'divident']
+	risk_free_rate = data_set.loc[i,'interest']
+	v0 = data_set.loc[i,'v_0']
+	kappa = data_set.loc[i,'kappa_']
+	theta = data_set.loc[i,'theta_']
+	ita = data_set.loc[i,'ita_']
+	rho = data_set.loc[i,'rho_']
 
 
 	payoff = ql.PlainVanillaPayoff(option_type, strike_price)
@@ -54,9 +54,11 @@ for i in range(N_sample):
 	                                theta,
 	                                rho)
 	#print(v0,kappa,  ita,  theta,rho)
-	engine = ql.AnalyticHestonEngine(ql.HestonModel(heston_process))
+	engine = ql.AnalyticHestonEngine(ql.HestonModel(heston_process),10**-8, 100000)
 	european_option.setPricingEngine(engine)
 	heston_price_check[i] = european_option.NPV()
+	if i%200==0:
+		print(i)
 	if 2*kappa*ita>theta**2:
 		condition[i] = 1
 	else:
@@ -66,7 +68,7 @@ data_set['checkPrice'] = heston_price_check
 data_set['condition'] = condition
 #data_set.to_csv('checked_price.csv')
 
-diff = data_set[abs(data_set['heston_price'] - data_set['checkPrice'])>0.5]
+diff = data_set[abs(data_set['heston_price'] - data_set['checkPrice'])>0.0001]
 diff.to_csv('diff.csv')
 
 # test_set = data_set[abs(data_set['heston_price'] - data_set['checkPrice'])<0.1]

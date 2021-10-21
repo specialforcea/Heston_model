@@ -6,8 +6,8 @@ from matplotlib import pyplot as plt
 
 
 
-N_sample = 20000*2
-N_select = 20000
+N_sample = 20000
+
 
 
 #constants
@@ -26,7 +26,7 @@ spot_handle = ql.QuoteHandle(
 #
 
 #training data
-mat_data_range = np.random.randint(330,360,size=N_sample)
+mat_data_range = np.random.randint(30,70,size=N_sample)
 strike = np.random.uniform(0.4,1.6,size=N_sample)
 interest = np.random.uniform(0.015,0.025,size=N_sample)
 divident = np.random.uniform(0,0.05,size=N_sample)
@@ -76,7 +76,7 @@ for i in range(N_sample):
                                     theta,
                                     rho)
   #print(v0,kappa,  ita,  theta,rho)
-  engine = ql.AnalyticHestonEngine(ql.HestonModel(heston_process),0.00001, 10000)
+  engine = ql.AnalyticHestonEngine(ql.HestonModel(heston_process),10**-10, 100000)
   european_option.setPricingEngine(engine)
   heston_price[i] = european_option.NPV()
   # if heston_price[i]<0:
@@ -112,7 +112,7 @@ train_set_df = pd.DataFrame(training_set,columns=['mat_data_range','strike','int
 
 
 train_set_df.to_csv('training set.csv')
-training_set_neg = train_set_df[train_set_df['heston_price']<0]
-training_set_neg.to_csv('negs.csv')
+# training_set_neg = train_set_df[train_set_df['heston_price']<0]
+# training_set_neg.to_csv('negs.csv')
 # plt.scatter(strike,heston_price)
 # plt.show()

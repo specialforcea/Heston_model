@@ -10,7 +10,7 @@ N_sample = 100000
 
 
 #constants
-t = time.time()
+
 calculation_date = ql.Date(31, 3, 2020)
 serial_today = calculation_date.serialNumber()#print(calculation_date.serialNumber())
 spot_price = 100.0
@@ -25,12 +25,12 @@ spot_handle = ql.QuoteHandle(
 #
 
 #training data
-mat_data_range = np.random.randint(330,360,size=N_sample)
-strike = np.random.uniform(0.4,1.6,size=N_sample)
+mat_data_range = np.random.randint(30,70,size=N_sample)
+strike = np.random.uniform(0.5,1.5,size=N_sample)
 interest = np.random.uniform(0.015,0.025,size=N_sample)
 divident = np.random.uniform(0,0.05,size=N_sample)
-kappa_ = np.random.uniform(1.4,2.6,size=N_sample)
-rho_ = np.random.uniform(-0.85,-0.55,size=N_sample)
+kappa_ = np.random.uniform(1.5,2.5,size=N_sample)
+rho_ = np.random.uniform(-0.8,-0.6,size=N_sample)
 theta_ = np.random.uniform(0.1,0.2,size=N_sample)
 cum_ita = np.random.uniform(0.,1.0,size=N_sample)
 ita_ = -np.log(np.exp(-0.02) - cum_ita*(np.exp(-0.02)-np.exp(-0.1)))
@@ -43,8 +43,9 @@ heston_price = np.zeros(N_sample)
 
 
 
-
+t = time.time()
 for i in range(N_sample):
+  
   maturity_date = ql.Date(serial_today + int(mat_data_range[i]))
   strike_price = spot_price*strike[i]
   dividend_rate =  divident[i]
@@ -76,7 +77,7 @@ for i in range(N_sample):
                                     theta,
                                     rho)
   #print(v0,kappa,  ita,  theta,rho)
-  engine = ql.AnalyticHestonEngine(ql.HestonModel(heston_process),0.00001, 10000)
+  engine = ql.AnalyticHestonEngine(ql.HestonModel(heston_process),10**-10, 100000)
   european_option.setPricingEngine(engine)
   heston_price[i] = european_option.NPV()
 
